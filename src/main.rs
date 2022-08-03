@@ -1,7 +1,10 @@
+use rand::Rng;
 use serenity::async_trait;
 use serenity::builder::CreateEmbed;
 use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{CommandResult, StandardFramework};
+use serenity::model::application::command::CommandOptionType;
+use serenity::model::application::interaction::application_command::CommandDataOptionValue;
 use serenity::model::application::interaction::Interaction;
 use serenity::model::channel::Message;
 use serenity::model::guild::Member;
@@ -10,7 +13,6 @@ use serenity::model::prelude::Ready;
 use serenity::prelude::*;
 use std::env;
 use std::time::Instant;
-use rand::Rng; 
 
 #[group]
 #[commands(ping)]
@@ -25,12 +27,38 @@ impl EventHandler for Handler {
             "\x1b[1;32m[ONLINE] \x1b[0;31mConnected as {}\x1b[0m",
             ready.user.tag()
         );
-        let _slashcommand = Command::create_global_application_command(&ctx.http, |command| {
+        let _binslash = Command::create_global_application_command(&ctx.http, |command| {
             command.name("bins").description("List code bins")
         })
         .await;
-        let _ = Command::create_global_application_command(&ctx.http, |command| {
+        let _pingslash = Command::create_global_application_command(&ctx.http, |command| {
             command.name("ping").description("Shows latency")
+        })
+        .await;
+        let _muteslash = Command::create_global_application_command(&ctx.http, |command| {
+            command
+                .name("mute")
+                .description("Mute a user in the guild")
+                .create_option(|option| {
+                    option
+                        .name("user")
+                        .description("The user you'd like to mute")
+                        .kind(CommandOptionType::User)
+                        .required(true)
+                })
+        })
+        .await;
+        let _unmuteslash = Command::create_global_application_command(&ctx.http, |command| {
+            command
+                .name("unmute")
+                .description("Unmute a user in the guild")
+                .create_option(|option| {
+                    option
+                        .name("user")
+                        .description("The user you'd like to unmute")
+                        .kind(CommandOptionType::User)
+                        .required(true)
+                })
         })
         .await;
     }
@@ -68,6 +96,112 @@ impl EventHandler for Handler {
                         })
                         .await
                 }
+                "mute" => {
+                    let options = command
+                        .data
+                        .options
+                        .get(0)
+                        .expect("Expected user option")
+                        .resolved
+                        .as_ref()
+                        .expect("Expected user object");
+
+                    if let CommandDataOptionValue::User(user, _member) = options {
+                        use serenity::model::prelude::GuildId;
+                        let guild_id: GuildId = serenity::model::id::GuildId(644764850706448384);
+                        guild_id
+                            .member(&ctx.http, user.id)
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 661684608034799637)
+                            .await
+                            .unwrap();
+
+                        guild_id
+                            .member(&ctx.http, user.id)
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 775603112207056916)
+                            .await
+                            .unwrap();
+
+                        msg_interaction
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content(format!(
+                                            "Favorably, {}'s mute resulted in `true`!",
+                                            user
+                                        ))
+                                        .ephemeral(false)
+                                })
+                            })
+                            .await
+                    } else {
+                        msg_interaction
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Please provide a valid user.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
+                "unmute" => {
+                    let options = command
+                        .data
+                        .options
+                        .get(0)
+                        .expect("Expected user option")
+                        .resolved
+                        .as_ref()
+                        .expect("Expected user object");
+
+                    if let CommandDataOptionValue::User(user, _member) = options {
+                        use serenity::model::prelude::GuildId;
+                        let guild_id: GuildId = serenity::model::id::GuildId(644764850706448384);
+                        guild_id
+                            .member(&ctx.http, user.id)
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 661684608034799637)
+                            .await
+                            .unwrap();
+
+                        guild_id
+                            .member(&ctx.http, user.id)
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 775603112207056916)
+                            .await
+                            .unwrap();
+
+                        msg_interaction
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content(format!(
+                                            "Favorably, {}'s unmute resulted in `true`!",
+                                            user
+                                        ))
+                                        .ephemeral(false)
+                                })
+                            })
+                            .await
+                    } else {
+                        msg_interaction
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Please provide a valid user.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
                 _ => {
                     msg_interaction
                         .create_interaction_response(&ctx.http, |response| {
@@ -83,7 +217,11 @@ impl EventHandler for Handler {
     async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
         let guild_id = new_member.guild_id;
         if let Ok(guild) = guild_id.to_partial_guild(&ctx).await {
-            new_member.clone().add_role(&ctx, 775603112207056916).await.unwrap();
+            new_member
+                .clone()
+                .add_role(&ctx, 775603112207056916)
+                .await
+                .unwrap();
 
             let channels = guild.channels(&ctx).await.unwrap();
             let channel_search = channels.values().find(|c| c.name == "general");
@@ -101,7 +239,6 @@ impl EventHandler for Handler {
                             ));
                             e.color((num, num, num));
                             e.footer(|f| f.text("Welcome!"))
-
                         })
                     })
                     .await;
@@ -115,6 +252,8 @@ async fn main() {
     let framework = StandardFramework::new()
         .configure(|c| c.prefix("~"))
         .group(&GENERAL_GROUP);
+
+    dotenv::dotenv().expect("Failed to load .env");
 
     let token = env::var("TOKEN").expect("token");
     let intents = GatewayIntents::non_privileged()
