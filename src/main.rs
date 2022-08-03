@@ -9,7 +9,7 @@ use serenity::model::application::interaction::Interaction;
 use serenity::model::channel::Message;
 use serenity::model::guild::Member;
 use serenity::model::prelude::command::Command;
-use serenity::model::prelude::Ready;
+use serenity::model::prelude::{Ready, GuildId};
 use serenity::prelude::*;
 use std::env;
 use std::time::Instant;
@@ -107,7 +107,6 @@ impl EventHandler for Handler {
                         .expect("Expected user object");
 
                     if let CommandDataOptionValue::User(user, _member) = options {
-                        use serenity::model::prelude::GuildId;
                         let guild_id: GuildId = serenity::model::id::GuildId(644764850706448384);
                         guild_id
                             .member(&ctx.http, user.id)
