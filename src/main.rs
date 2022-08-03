@@ -83,11 +83,12 @@ impl EventHandler for Handler {
     async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
         let guild_id = new_member.guild_id;
         if let Ok(guild) = guild_id.to_partial_guild(&ctx).await {
+            new_member.clone().add_role(&ctx, 775603112207056916).await.unwrap();
+
             let channels = guild.channels(&ctx).await.unwrap();
             let channel_search = channels.values().find(|c| c.name == "general");
             if let Some(channel) = channel_search {
                 let num = rand::thread_rng().gen_range(0..=255);
-
                 let _ = channel
                     .send_message(&ctx, |m| {
                         m.embed(|e| {
