@@ -427,51 +427,72 @@ impl EventHandler for Handler {
                         .await
                 }
                 "mute" => {
-                    let options = command
-                        .data
-                        .options
-                        .get(0)
-                        .expect("Expected user option")
-                        .resolved
-                        .as_ref()
-                        .expect("Expected user object");
+                    let has_permission = GuildId(644764850706448384)
+                        .member(&ctx.http, &msg_interaction.user)
+                        .await
+                        .unwrap()
+                        .permissions(&ctx)
+                        .unwrap()
+                        .contains(serenity::model::Permissions::MANAGE_ROLES);
 
-                    if let CommandDataOptionValue::User(user, _member) = options {
-                        let guild_id: GuildId = serenity::model::id::GuildId(644764850706448384);
-                        guild_id
-                            .member(&ctx.http, user.id)
-                            .await
-                            .unwrap()
-                            .add_role(&ctx, 661684608034799637)
-                            .await
-                            .unwrap();
+                    if has_permission {
+                        let options = command
+                            .data
+                            .options
+                            .get(0)
+                            .expect("Expected user option")
+                            .resolved
+                            .as_ref()
+                            .expect("Expected user object");
 
-                        guild_id
-                            .member(&ctx.http, user.id)
-                            .await
-                            .unwrap()
-                            .remove_role(&ctx, 775603112207056916)
-                            .await
-                            .unwrap();
+                        if let CommandDataOptionValue::User(user, _member) = options {
+                            let guild_id: GuildId =
+                                serenity::model::id::GuildId(644764850706448384);
+                            guild_id
+                                .member(&ctx.http, user.id)
+                                .await
+                                .unwrap()
+                                .add_role(&ctx, 661684608034799637)
+                                .await
+                                .unwrap();
 
-                        msg_interaction
-                            .create_interaction_response(&ctx.http, |response| {
-                                response.interaction_response_data(|message| {
-                                    message
-                                        .content(format!(
-                                            "Favorably, {}'s mute resulted in `true`!",
-                                            user
-                                        ))
-                                        .ephemeral(false)
+                            guild_id
+                                .member(&ctx.http, user.id)
+                                .await
+                                .unwrap()
+                                .remove_role(&ctx, 775603112207056916)
+                                .await
+                                .unwrap();
+
+                            msg_interaction
+                                .create_interaction_response(&ctx.http, |response| {
+                                    response.interaction_response_data(|message| {
+                                        message
+                                            .content(format!(
+                                                "Favorably, {}'s mute resulted in `true`!",
+                                                user
+                                            ))
+                                            .ephemeral(false)
+                                    })
                                 })
-                            })
-                            .await
+                                .await
+                        } else {
+                            msg_interaction
+                                .create_interaction_response(&ctx.http, |response| {
+                                    response.interaction_response_data(|message| {
+                                        message
+                                            .content("Please provide a valid user.")
+                                            .ephemeral(true)
+                                    })
+                                })
+                                .await
+                        }
                     } else {
                         msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
-                                        .content("Please provide a valid user.")
+                                        .content("You're prohibited from using this command.")
                                         .ephemeral(true)
                                 })
                             })
@@ -479,50 +500,69 @@ impl EventHandler for Handler {
                     }
                 }
                 "unmute" => {
-                    let options = command
-                        .data
-                        .options
-                        .get(0)
-                        .expect("Expected user option")
-                        .resolved
-                        .as_ref()
-                        .expect("Expected user object");
+                    let has_permission = GuildId(644764850706448384)
+                        .member(&ctx.http, &msg_interaction.user)
+                        .await
+                        .unwrap()
+                        .permissions(&ctx)
+                        .unwrap()
+                        .contains(serenity::model::Permissions::MANAGE_ROLES);
+                    if has_permission {
+                        let options = command
+                            .data
+                            .options
+                            .get(0)
+                            .expect("Expected user option")
+                            .resolved
+                            .as_ref()
+                            .expect("Expected user object");
 
-                    if let CommandDataOptionValue::User(user, _member) = options {
-                        GuildId(644764850706448384)
-                            .member(&ctx.http, user.id)
-                            .await
-                            .unwrap()
-                            .remove_role(&ctx, 661684608034799637)
-                            .await
-                            .unwrap();
+                        if let CommandDataOptionValue::User(user, _member) = options {
+                            GuildId(644764850706448384)
+                                .member(&ctx.http, user.id)
+                                .await
+                                .unwrap()
+                                .remove_role(&ctx, 661684608034799637)
+                                .await
+                                .unwrap();
 
-                        GuildId(644764850706448384)
-                            .member(&ctx.http, user.id)
-                            .await
-                            .unwrap()
-                            .add_role(&ctx, 775603112207056916)
-                            .await
-                            .unwrap();
+                            GuildId(644764850706448384)
+                                .member(&ctx.http, user.id)
+                                .await
+                                .unwrap()
+                                .add_role(&ctx, 775603112207056916)
+                                .await
+                                .unwrap();
 
-                        msg_interaction
-                            .create_interaction_response(&ctx.http, |response| {
-                                response.interaction_response_data(|message| {
-                                    message
-                                        .content(format!(
-                                            "Favorably, {}'s unmute resulted in `true`!",
-                                            user
-                                        ))
-                                        .ephemeral(false)
+                            msg_interaction
+                                .create_interaction_response(&ctx.http, |response| {
+                                    response.interaction_response_data(|message| {
+                                        message
+                                            .content(format!(
+                                                "Favorably, {}'s unmute resulted in `true`!",
+                                                user
+                                            ))
+                                            .ephemeral(false)
+                                    })
                                 })
-                            })
-                            .await
+                                .await
+                        } else {
+                            msg_interaction
+                                .create_interaction_response(&ctx.http, |response| {
+                                    response.interaction_response_data(|message| {
+                                        message
+                                            .content("Please provide a valid user.")
+                                            .ephemeral(true)
+                                    })
+                                })
+                                .await
+                        }
                     } else {
                         msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
-                                        .content("Please provide a valid user.")
+                                        .content("You're prohibited from using this command.")
                                         .ephemeral(true)
                                 })
                             })
