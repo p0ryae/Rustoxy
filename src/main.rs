@@ -1,21 +1,22 @@
 use rand::Rng;
 use serenity::async_trait;
-use serenity::builder::CreateEmbed;
 use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{CommandResult, StandardFramework};
 use serenity::model::application::command::CommandOptionType;
+use serenity::model::application::component::ButtonStyle;
 use serenity::model::application::interaction::application_command::CommandDataOptionValue;
 use serenity::model::application::interaction::Interaction;
 use serenity::model::channel::Message;
 use serenity::model::guild::Member;
 use serenity::model::prelude::command::Command;
-use serenity::model::prelude::{Ready, GuildId};
+use serenity::model::prelude::{GuildId, Ready};
+
 use serenity::prelude::*;
 use std::env;
 use std::time::Instant;
 
 #[group]
-#[commands(ping)]
+#[commands(ping, roles)]
 struct General;
 
 struct Handler;
@@ -63,6 +64,335 @@ impl EventHandler for Handler {
         .await;
     }
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        if let Interaction::MessageComponent(ref command) = interaction {
+            let _content = match command.data.custom_id.as_str() {
+                "button_homie" => {
+                    let has_role = if let Ok(e) = interaction
+                        .clone()
+                        .message_component()
+                        .unwrap()
+                        .user
+                        .has_role(&ctx.http, 644764850706448384, 798793150905974844)
+                        .await
+                    {
+                        e
+                    } else {
+                        false
+                    };
+                    if has_role {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 798793150905974844)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Detached the **Homies** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    } else {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 798793150905974844)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Added the **Homies** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
+                "button_updates" => {
+                    let has_role = if let Ok(e) = interaction
+                        .clone()
+                        .message_component()
+                        .unwrap()
+                        .user
+                        .has_role(&ctx.http, 644764850706448384, 813307957411971082)
+                        .await
+                    {
+                        e
+                    } else {
+                        false
+                    };
+                    if has_role {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 813307957411971082)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Detached the **Updates** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    } else {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 813307957411971082)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Added the **Updates** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
+                "button_windows" => {
+                    let has_role = if let Ok(e) = interaction
+                        .clone()
+                        .message_component()
+                        .unwrap()
+                        .user
+                        .has_role(&ctx.http, 644764850706448384, 923446403181735978)
+                        .await
+                    {
+                        e
+                    } else {
+                        false
+                    };
+                    if has_role {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 923446403181735978)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Detached the **Windows** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    } else {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 923446403181735978)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Added the **Windows** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
+                "button_linux" => {
+                    let has_role = if let Ok(e) = interaction
+                        .clone()
+                        .message_component()
+                        .unwrap()
+                        .user
+                        .has_role(&ctx.http, 644764850706448384, 923446319610232852)
+                        .await
+                    {
+                        e
+                    } else {
+                        false
+                    };
+                    if has_role {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 923446319610232852)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Detached the **Linux** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    } else {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 923446319610232852)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message.content("Added the **Linux** role.").ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
+                "button_apple" => {
+                    let has_role = if let Ok(e) = interaction
+                        .clone()
+                        .message_component()
+                        .unwrap()
+                        .user
+                        .has_role(&ctx.http, 644764850706448384, 923446471779553280)
+                        .await
+                    {
+                        e
+                    } else {
+                        false
+                    };
+                    if has_role {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .remove_role(&ctx, 923446471779553280)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Detached the **MacOS** role.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    } else {
+                        GuildId(644764850706448384)
+                            .member(
+                                &ctx.http,
+                                interaction.clone().message_component().unwrap().user,
+                            )
+                            .await
+                            .unwrap()
+                            .add_role(&ctx, 923446471779553280)
+                            .await
+                            .unwrap();
+
+                        interaction
+                            .clone()
+                            .message_component()
+                            .unwrap()
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message.content("Added the **MacOS** role.").ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
+                _ => {
+                    interaction
+                        .clone()
+                        .message_component()
+                        .unwrap()
+                        .create_interaction_response(&ctx.http, |response| {
+                            response.interaction_response_data(|message| {
+                                message
+                                    .content("Couldn't identify MessageComponent.")
+                                    .ephemeral(true)
+                            })
+                        })
+                        .await
+                }
+            };
+        }
         if let Interaction::ApplicationCommand(ref command) = interaction {
             let msg_interaction = interaction.clone().application_command().unwrap();
             let _content = match command.data.name.as_str() {
@@ -76,7 +406,7 @@ impl EventHandler for Handler {
                         .await
                 }
                 "bins" => {
-                    let mut embed = CreateEmbed::default();
+                    let mut embed = serenity::builder::CreateEmbed::default();
                     embed.title("Paste your code in one of the following websites");
                     embed.description(
                         "> [__`SourceBin`__](https://sourceb.in/)
@@ -159,9 +489,7 @@ impl EventHandler for Handler {
                         .expect("Expected user object");
 
                     if let CommandDataOptionValue::User(user, _member) = options {
-                        use serenity::model::prelude::GuildId;
-                        let guild_id: GuildId = serenity::model::id::GuildId(644764850706448384);
-                        guild_id
+                        GuildId(644764850706448384)
                             .member(&ctx.http, user.id)
                             .await
                             .unwrap()
@@ -169,7 +497,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        guild_id
+                        GuildId(644764850706448384)
                             .member(&ctx.http, user.id)
                             .await
                             .unwrap()
@@ -285,6 +613,58 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
                 content,
                 (after - before).as_millis()
             ))
+        })
+        .await?;
+
+    Ok(())
+}
+
+#[command]
+async fn roles(ctx: &Context, msg: &Message) -> CommandResult {
+    msg.channel_id
+        .send_message(&ctx, |message| {
+            message
+                .add_embed(|embed| {
+                    embed
+                        .description(
+                            "😈 **- Dash's Homies**\n`-` DashCruft uses this role to ping for special news, suggestions, leaks or just for fun.\n\n🌐 **-  Updates**\n`-` Stay tuned with the latest updates regarding DashCruft's projects and such\n\n🪟🐧🍎 **-  Operating System**\n`-` What is your operating system? Windows, Linux or MacOS (Apple)",
+                        )
+                        .color((47, 49, 54))
+                })
+                .components(|components| {
+                    components.create_action_row(|action_row| {
+                        action_row.create_button(|button| {
+                            button
+                                .custom_id("button_homie")
+                                .emoji('😈')
+                                .style(ButtonStyle::Primary)
+                        });
+                        action_row.create_button(|button| {
+                            button
+                                .custom_id("button_updates")
+                                .emoji('🌐')
+                                .style(ButtonStyle::Primary)
+                        });
+                        action_row.create_button(|button| {
+                            button
+                                .custom_id("button_windows")
+                                .emoji('🪟')
+                                .style(ButtonStyle::Primary)
+                        });
+                        action_row.create_button(|button| {
+                            button
+                                .custom_id("button_linux")
+                                .emoji('🐧')
+                                .style(ButtonStyle::Primary)
+                        });
+                        action_row.create_button(|button| {
+                            button
+                                .custom_id("button_apple")
+                                .emoji('🍎')
+                                .style(ButtonStyle::Primary)
+                        })
+                    })
+                })
         })
         .await?;
 
