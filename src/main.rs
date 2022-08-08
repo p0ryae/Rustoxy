@@ -5,11 +5,12 @@ use serenity::async_trait;
 use serenity::framework::standard::macros::group;
 use serenity::framework::standard::StandardFramework;
 use serenity::model::application::command::CommandOptionType;
+use serenity::model::application::component::{ActionRowComponent, InputText};
 use serenity::model::application::interaction::application_command::CommandDataOptionValue;
-use serenity::model::application::interaction::Interaction;
+use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::guild::Member;
 use serenity::model::prelude::command::Command;
-use serenity::model::prelude::{GuildId, Ready};
+use serenity::model::prelude::{ChannelId, GuildId, Ready};
 use serenity::prelude::*;
 
 use rand::Rng;
@@ -34,6 +35,19 @@ impl EventHandler for Handler {
         .await;
         let _pingslash = Command::create_global_application_command(&ctx.http, |command| {
             command.name("ping").description("Shows latency")
+        })
+        .await;
+        let _reportslash = Command::create_global_application_command(&ctx.http, |command| {
+            command
+                .name("report")
+                .description("Report a user")
+                .create_option(|option| {
+                    option
+                        .name("user")
+                        .description("The user you'd like to report")
+                        .kind(CommandOptionType::User)
+                        .required(true)
+                })
         })
         .await;
         let _muteslash = Command::create_global_application_command(&ctx.http, |command| {
@@ -65,6 +79,7 @@ impl EventHandler for Handler {
     }
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::MessageComponent(ref command) = interaction {
+            let msg_interaction = interaction.clone().message_component().unwrap();
             let _content = match command.data.custom_id.as_str() {
                 "button_homie" => {
                     let has_role = if let Ok(e) = interaction
@@ -91,10 +106,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -115,10 +127,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -154,10 +163,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -178,10 +184,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -217,10 +220,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -241,10 +241,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -280,10 +277,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -341,10 +335,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message
@@ -365,10 +356,7 @@ impl EventHandler for Handler {
                             .await
                             .unwrap();
 
-                        interaction
-                            .clone()
-                            .message_component()
-                            .unwrap()
+                        msg_interaction
                             .create_interaction_response(&ctx.http, |response| {
                                 response.interaction_response_data(|message| {
                                     message.content("Added the **MacOS** role.").ephemeral(true)
@@ -378,10 +366,7 @@ impl EventHandler for Handler {
                     }
                 }
                 _ => {
-                    interaction
-                        .clone()
-                        .message_component()
-                        .unwrap()
+                    msg_interaction
                         .create_interaction_response(&ctx.http, |response| {
                             response.interaction_response_data(|message| {
                                 message
@@ -393,9 +378,91 @@ impl EventHandler for Handler {
                 }
             };
         }
+
+        if let Interaction::ModalSubmit(ref command) = interaction {
+            let msg_interaction = interaction.clone().modal_submit().unwrap();
+            let _content = match command.data.custom_id.as_str() {
+                "report_modal" => {
+                    msg_interaction
+                        .create_interaction_response(&ctx.http, |response| {
+                            response.interaction_response_data(|message| {
+                                message.content("Effectively **Reported**. Our Staff Team will look into this ASAP.").ephemeral(true)
+                            })
+                        })
+                        .await.ok();
+
+                    if let ActionRowComponent::InputText(InputText {
+                        kind: _,
+                        custom_id: _,
+                        value,
+                    }) = &command.data.components[0].components[0]
+                    {
+                        ChannelId(1006037491779907714)
+                            .send_message(&ctx, |m| {
+                                m.embed(|e| {
+                                    e.title(msg_interaction.user.tag());
+                                    e.description(format!("**INFO**: {}", value));
+                                    e.color((47, 49, 54))
+                                })
+                            })
+                            .await
+                            .ok();
+                    }
+                }
+                _ => {
+                    ChannelId(1006037491779907714)
+                        .send_message(&ctx.http, |m| m.content("A report has failed to arrive."))
+                        .await
+                        .ok();
+                }
+            };
+        }
+
         if let Interaction::ApplicationCommand(ref command) = interaction {
             let msg_interaction = interaction.clone().application_command().unwrap();
             let _content = match command.data.name.as_str() {
+                "report" => {
+                    let options = command
+                        .data
+                        .options
+                        .get(0)
+                        .expect("Expected user option")
+                        .resolved
+                        .as_ref()
+                        .expect("Expected user object");
+
+                    if let CommandDataOptionValue::User(user, _member) = options {
+                        msg_interaction.create_interaction_response(&ctx.http, |response| {
+                        response
+                            .kind(InteractionResponseType::Modal)
+                            .interaction_response_data(|message| {
+                                message
+                                    .components(|components| {
+                                        components.create_action_row(|row| {
+                                            row.create_input_text(|b| {
+                                                b.label("reason (state the person as well)");
+                                                b.style(serenity::model::application::component::InputTextStyle::Paragraph);
+                                                b.custom_id("reason_modal_input")
+                                            })
+                                        })
+                                    })
+                                    .title(format!("Report {}", user.name))
+                                    .custom_id("report_modal")
+                            })
+                        })
+                    .await
+                    } else {
+                        msg_interaction
+                            .create_interaction_response(&ctx.http, |response| {
+                                response.interaction_response_data(|message| {
+                                    message
+                                        .content("Please provide a valid user.")
+                                        .ephemeral(true)
+                                })
+                            })
+                            .await
+                    }
+                }
                 "ping" => {
                     msg_interaction
                         .create_interaction_response(&ctx.http, |response| {
