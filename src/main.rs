@@ -391,6 +391,7 @@ impl EventHandler for Handler {
                         })
                         .await.ok();
 
+                        
                     if let ActionRowComponent::InputText(InputText {
                         kind: _,
                         custom_id: _,
